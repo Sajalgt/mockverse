@@ -15,11 +15,11 @@ export async function generateSchema(userInput) {
   return data.schema;
 }
 
-export async function runLoadTest(schema, targetUrl, batchSize = 50) {
+export async function runLoadTest(schema, targetUrl, batchSize = 50, method = 'POST') {
   const response = await fetch(`${BASE_URL}/run-test`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ schema, targetUrl, batchSize }),
+    body: JSON.stringify({ schema, targetUrl, batchSize, method }),
   });
 
   if (!response.ok) {

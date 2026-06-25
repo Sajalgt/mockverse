@@ -1,5 +1,7 @@
-async function runLoadTest(targetUrl, records, onProgress, batchSize = 50) {
-  const BATCH_SIZE = batchSize; // ab parameter se aa raha hai, hardcoded nahi
+const BODY_METHODS = ['POST', 'PUT', 'PATCH'];
+
+async function runLoadTest(targetUrl, records, onProgress, batchSize = 50, method = 'POST') {
+  const BATCH_SIZE = batchSize;
   const batches = createBatches(records, BATCH_SIZE);
 
   const results = [];
@@ -9,12 +11,11 @@ async function runLoadTest(targetUrl, records, onProgress, batchSize = 50) {
 
   for (const batch of batches) {
     const batchResults = await Promise.all(
-      batch.map((record) => sendSingleRequest(targetUrl, record))
+      batch.map((record) => sendSingleRequest(targetUrl, record, method))
     );
 
     batchResults.forEach((result) => {
       results.push(result);
-
       if (result.success) {
         successCount++;
       } else {
@@ -35,8 +36,7 @@ async function runLoadTest(targetUrl, records, onProgress, batchSize = 50) {
   }
 
   const responseTimes = results.map((r) => r.responseTime).sort((a, b) => a - b);
-  const avgResponseTime =
-    responseTimes.reduce((sum, t) => sum + t, 0) / responseTimes.length;
+  const avgResponseTime = responseTimes.reduce((sum, t) => sum + t, 0) / responseTimes.length;
   const minResponseTime = responseTimes[0] || 0;
   const maxResponseTime = responseTimes[responseTimes.length - 1] || 0;
   const p95Index = Math.floor(responseTimes.length * 0.95);
@@ -56,13 +56,14 @@ async function runLoadTest(targetUrl, records, onProgress, batchSize = 50) {
   };
 }
 
-function sendSingleRequest(targetUrl, record) {
+function sendSingleRequest(targetUrl, record, method = 'POST') {
   const startTime = Date.now();
+  const hasBody = BODY_METHODS.includes(method.toUpperCase());
 
   return fetch(targetUrl, {
-    method: 'POST',
+    method: method.toUpperCase(),
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(record),
+    body: hasBody ? JSON.stringify(record) : undefined,
   })
     .then((response) => ({
       success: response.ok,

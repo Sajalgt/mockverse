@@ -3,7 +3,7 @@ const { runLoadTest } = require('../services/loadTester');
 
 async function handleRunTest(req, res, io) {
   try {
-    const { schema, targetUrl, batchSize } = req.body;
+    const { schema, targetUrl, batchSize, method } = req.body;
 
     if (!schema || !targetUrl) {
       return res.status(400).json({ error: 'schema aur targetUrl dono zaroori hain' });
@@ -15,9 +15,13 @@ async function handleRunTest(req, res, io) {
       ? batchSize
       : 50;
 
+    const safeMethod = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(method)
+      ? method
+      : 'POST';
+
     const result = await runLoadTest(targetUrl, records, (progress) => {
       io.emit('test-progress', progress);
-    }, safeBatchSize);
+    }, safeBatchSize, safeMethod);
 
     io.emit('test-complete', result);
 

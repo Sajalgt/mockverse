@@ -1,6 +1,6 @@
 const { generateValue } = require('../utils/fieldMapper');
 
-const MAX_RECORDS = 50000; // POC ke liye safe upper limit
+const MAX_RECORDS = 500000; // POC ke liye safe upper limit
 
 function generateSingleRecord(fields) {
   const record = {};

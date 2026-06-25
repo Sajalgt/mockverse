@@ -5,7 +5,7 @@ async function handleSchemaGeneration(req, res) {
     const { userInput } = req.body;
 
     if (!userInput || userInput.trim().length === 0) {
-      return res.status(400).json({ error: 'userInput zaroori hai' });
+      return res.status(400).json({ error: 'userInput is mandatory' });
     }
 
     const schema = await generateSchema(userInput);
