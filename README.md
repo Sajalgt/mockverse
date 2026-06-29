@@ -1,6 +1,8 @@
+
+```markdown
 # MockVerse
 
-> AI-powered synthetic test data generator and API load tester — describe your data in plain English, generate thousands of realistic fake records, and stress-test any API endpoint in real time.
+> AI-powered synthetic test data generator and API load tester — describe your data in plain English, generate up to 500,000 realistic fake records, and stress-test any API endpoint in real time.
 
 ---
 
@@ -16,6 +18,9 @@ Instead of manually writing fake JSON or setting up complex seeding scripts, Moc
 
 > Start the backend and frontend locally (see Setup below), then open `http://localhost:5173`
 
+![MockVerse Demo](./demo.png)
+
+---
 
 ## Key Features
 
@@ -23,10 +28,23 @@ Instead of manually writing fake JSON or setting up complex seeding scripts, Moc
 Type a plain-English description like *"I need 5000 users with name, email, Delhi address, and a late-night order time"* — MockVerse sends this to Google's Gemini 2.5 Flash model with a strict structured output prompt. Gemini extracts only the relevant field names and data types, returning a clean JSON schema. No hallucinations, no extra text — just the schema.
 
 ### Realistic Bulk Data Generation (Faker.js)
-Gemini only runs once (for schema extraction). All actual data generation is handled locally using `@faker-js/faker` — a production-grade fake data library with 100+ generators. A custom field-type registry maps schema fields to the right Faker functions (`email → faker.internet.email()`, `night_time → custom time generator`, etc.), with partial-match fallback for unrecognized types. Zero API cost for data generation.
+Gemini only runs once (for schema extraction). All actual data generation is handled locally using `@faker-js/faker` — a production-grade fake data library with 100+ generators. A custom field-type registry maps schema fields to the right Faker functions (`email → faker.internet.email()`, `night_time → custom time generator`, etc.), with partial-match fallback for unrecognized types. Zero API cost for data generation. Supports up to **500,000 records** per test run.
+
+### Full HTTP Method Support
+MockVerse supports all standard HTTP methods for load testing — not just POST. You can configure the test to hit your endpoint with:
+
+| Method | Typical Use Case |
+|---|---|
+| `GET` | Fetch/read endpoints, search APIs |
+| `POST` | Create resource endpoints |
+| `PUT` | Full update/replace endpoints |
+| `PATCH` | Partial update endpoints |
+| `DELETE` | Delete resource endpoints |
+
+Each request is sent with the generated fake record as the body (where applicable), and response metrics are tracked per method.
 
 ### Concurrent Load Testing with Batching
-Generated records are sent to your target API endpoint as concurrent HTTP POST requests. Requests are processed in configurable batches (1–500 concurrent requests per batch, user-controlled) using `Promise.all()`. This simulates real-world traffic patterns — not a simple sequential loop — and lets you find exactly where your API starts to crack under pressure.
+Generated records are sent to your target API endpoint as concurrent HTTP requests. Requests are processed in configurable batches (1–500 concurrent requests per batch, user-controlled) using `Promise.all()`. This simulates real-world traffic patterns — not a simple sequential loop — and lets you find exactly where your API starts to crack under pressure.
 
 ### Real-Time Live Progress (Socket.io)
 As the load test runs, a WebSocket connection (Socket.io) streams live progress updates to the frontend: requests sent, success count, failure count, and completion percentage — all updating in real time without polling. The progress bar and counters animate as each batch completes.
@@ -82,10 +100,10 @@ User Input (plain English)
   Extracts field names + types → JSON Schema
         ↓
   Faker.js (local, free)
-  Generates N fake records from schema
+  Generates up to 500k fake records from schema
         ↓
   Load Test Engine
-  Sends records as concurrent POST requests (batched)
+  Sends records as concurrent HTTP requests (GET/POST/PUT/PATCH/DELETE)
   Tracks success/fail/response times per request
         ↓
   Socket.io
@@ -101,17 +119,19 @@ User Input (plain English)
 
 ## Setup & Installation
 
-### Prerequisites
-- Node.js v18+
+### Option A — Run Locally
+
+#### Prerequisites
+- Node.js v20+
 - A free Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey)
 
-### 1. Clone the repository
+#### 1. Clone the repository
 ```bash
 git clone https://github.com/Sajalgt/mockverse.git
 cd mockverse
 ```
 
-### 2. Backend setup
+#### 2. Backend setup
 ```bash
 cd backend
 npm install
@@ -119,20 +139,20 @@ cp .env.example .env
 # Add your Gemini API key to .env
 ```
 
-### 3. Configure `.env`
+#### 3. Configure `.env`
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
 USE_MOCK_GEMINI=true   # set to false to enable real Gemini responses
 PORT=5000
 ```
 
-### 4. Frontend setup
+#### 4. Frontend setup
 ```bash
 cd ../frontend
 npm install
 ```
 
-### 5. Run the app
+#### 5. Run the app
 
 **Terminal 1 — Backend:**
 ```bash
@@ -147,6 +167,55 @@ npm run dev
 ```
 
 Open `http://localhost:5173` in your browser.
+
+---
+
+### Option B — Run with Docker
+
+#### Prerequisites
+- Docker and Docker Compose installed
+- A free Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey)
+
+#### 1. Clone the repository
+```bash
+git clone https://github.com/Sajalgt/mockverse.git
+cd mockverse
+```
+
+#### 2. Configure environment variables
+```bash
+cd backend
+cp .env.example .env
+# Add your Gemini API key to .env
+```
+
+#### 3. Build and start containers
+```bash
+# From the project root
+docker-compose up --build
+```
+
+Open `http://localhost:5173` in your browser.
+
+#### Notes on Docker networking
+- The backend runs on `node:20-alpine` inside a container
+- Frontend calls to the backend must use `host.docker.internal` instead of `localhost` when running both services in separate containers — this is already handled in the Docker Compose config
+- Avoid port `6000` — some browsers (notably Firefox) block it; the backend is configured on port `5000` and the frontend dev server on `5173`
+- Node.js v20 is required inside the container — `faker v10+` and `Vite v8+` are incompatible with Node 18
+
+#### Docker Compose overview
+```yaml
+services:
+  backend:
+    build: ./backend      # node:20-alpine
+    ports: ["5000:5000"]
+    env_file: ./backend/.env
+
+  frontend:
+    build: ./frontend
+    ports: ["5173:5173"]
+    depends_on: [backend]
+```
 
 ---
 
@@ -175,7 +244,7 @@ mockverse/
         ├── components/
         │   ├── SchemaInput.jsx       # Natural language input
         │   ├── SchemaPreview.jsx     # Generated schema display
-        │   ├── TargetApiForm.jsx     # URL + concurrency config
+        │   ├── TargetApiForm.jsx     # URL + HTTP method + concurrency config
         │   ├── LiveProgress.jsx      # Real-time progress bar + counters
         │   ├── ResultsChart.jsx      # Pie chart + response time metrics
         │   └── ErrorBreakdown.jsx    # Error type categorization
@@ -192,10 +261,24 @@ mockverse/
 | Method | Endpoint | Description |
 |---|---|---|
 | POST | `/api/generate-schema` | Accepts `{ userInput }`, returns JSON schema |
-| POST | `/api/run-test` | Accepts `{ schema, targetUrl, batchSize }`, runs load test |
+| POST | `/api/run-test` | Accepts `{ schema, targetUrl, httpMethod, batchSize }`, runs load test |
+
+The `httpMethod` field in `/api/run-test` accepts: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`.
+
+---
+
+## Known Gotchas
+
+| Issue | Fix |
+|---|---|
+| Firefox blocks port 6000 | Use port 5000 for backend (already default) |
+| Node 18 breaks faker v10+ / Vite v8 | Use Node 20+ (enforced in Docker via `node:20-alpine`) |
+| Docker backend can't reach localhost | Use `host.docker.internal` in Docker Compose networking |
+| Gemini API rate limit (20 RPD free tier) | Enable `USE_MOCK_GEMINI=true` for development |
 
 ---
 
 ## License
 
 MIT © 2026 [Sajal](https://github.com/Sajalgt)
+```

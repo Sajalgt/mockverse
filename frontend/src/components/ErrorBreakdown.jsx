@@ -12,7 +12,7 @@ export default function ErrorBreakdown({ result }) {
         <h2 className="text-sm font-semibold text-gray-300">Error Breakdown</h2>
       </div>
 
-      <div className="bg-[#0f1117] rounded-lg border border-gray-800 divide-y divide-gray-800">
+      <div className="bg-[#1a1d2e] rounded-lg border border-gray-800 divide-y divide-gray-800">
         {errors.map(([errorType, count], idx) => (
           <div key={idx} className="flex justify-between items-center px-4 py-3">
             <span className="text-sm mono text-red-400">{errorType}</span>
@@ -35,3 +35,8 @@ export default function ErrorBreakdown({ result }) {
     </div>
   );
 }
+
+
+
+
+

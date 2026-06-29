@@ -67,7 +67,7 @@ export default function TargetApiForm({ schema, onTestStarted }) {
           <label className="text-xs text-gray-500 mono mb-1 block">TARGET API URL</label>
           <input
             type="text"
-            className="w-full bg-[#0f1117] border border-gray-700 rounded-lg p-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-indigo-500 mono"
+            className="w-full bg-[#1a1d2e] border border-gray-700 rounded-lg p-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-indigo-500 mono"
             placeholder="https://your-api.com/endpoint"
             value={targetUrl}
             onChange={(e) => setTargetUrl(e.target.value)}
@@ -80,7 +80,7 @@ export default function TargetApiForm({ schema, onTestStarted }) {
             <select
               value={method}
               onChange={(e) => setMethod(e.target.value)}
-              className="bg-[#0f1117] border border-gray-700 rounded-lg p-3 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 mono cursor-pointer"
+              className="bg-[#1a1d2e] border border-gray-700 rounded-lg p-3 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 mono cursor-pointer"
             >
               {HTTP_METHODS.map((m) => (
                 <option key={m} value={m}>{m}</option>
@@ -95,7 +95,7 @@ export default function TargetApiForm({ schema, onTestStarted }) {
                 type="number"
                 min={1}
                 max={500}
-                className="w-24 bg-[#0f1117] border border-gray-700 rounded-lg p-3 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 mono"
+                className="w-24 bg-[#1a1d2e] border border-gray-700 rounded-lg p-3 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 mono"
                 value={batchSize}
                 onChange={(e) => setBatchSize(Number(e.target.value))}
               />
@@ -104,7 +104,7 @@ export default function TargetApiForm({ schema, onTestStarted }) {
           </div>
         </div>
 
-        <p className="text-xs text-gray-600 mono bg-[#0f1117] border border-gray-800 rounded-lg px-3 py-2">
+        <p className="text-xs text-gray-600 mono bg-[#1a1d2e] border border-gray-800 rounded-lg px-3 py-2">
           {hasBody
             ? `✦ ${method} — synthetic data sent as JSON body per request.`
             : `✦ ${method} — no body sent. Requests hit the endpoint directly.`}
@@ -130,3 +130,8 @@ export default function TargetApiForm({ schema, onTestStarted }) {
     </div>
   );
 }
+
+
+
+
+

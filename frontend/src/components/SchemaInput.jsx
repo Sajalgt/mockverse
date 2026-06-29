@@ -1,5 +1,13 @@
 import { useState } from 'react';
 
+function isValidInput(input) {
+  const trimmed = input.trim();
+  if (trimmed.length < 10) return false;
+  const words = trimmed.split(/\s+/).filter(w => w.length > 1);
+  if (words.length < 2) return false;
+  return true;
+}
+
 export default function SchemaInput({ onSchemaGenerated }) {
   const [userInput, setUserInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -7,7 +15,12 @@ export default function SchemaInput({ onSchemaGenerated }) {
 
   async function handleGenerate() {
     if (!userInput.trim()) {
-      setError('Describe the data you need before generating.');
+      setError('Please describe the data you need.');
+      return;
+    }
+
+    if (!isValidInput(userInput)) {
+      setError('Please provide a meaningful description (e.g. "I need 100 users with name and email").');
       return;
     }
 
@@ -19,7 +32,7 @@ export default function SchemaInput({ onSchemaGenerated }) {
       const schema = await generateSchema(userInput);
       onSchemaGenerated(schema);
     } catch (err) {
-      setError('Failed to generate schema. Please try again.');
+      setError(err.message || 'Failed to generate schema. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -41,7 +54,10 @@ export default function SchemaInput({ onSchemaGenerated }) {
         rows={4}
         placeholder="e.g. I need 5000 users with name, email, Delhi address, and a late-night order time"
         value={userInput}
-        onChange={(e) => setUserInput(e.target.value)}
+        onChange={(e) => {
+          setUserInput(e.target.value);
+          if (error) setError('');
+        }}
       />
 
       {error && (

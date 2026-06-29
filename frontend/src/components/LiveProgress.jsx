@@ -27,20 +27,20 @@ export default function LiveProgress({ progress }) {
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-[#0f1117] rounded-lg p-3 text-center">
+        <div className="bg-[#1a1d2e] rounded-lg p-3 text-center">
           <p className="text-xl font-bold mono text-gray-200">
             {progress.sent}
             <span className="text-gray-600 text-sm">/{progress.total}</span>
           </p>
           <p className="text-xs text-gray-600 mt-1">Sent</p>
         </div>
-        <div className="bg-[#0f1117] rounded-lg p-3 text-center">
+        <div className="bg-[#1a1d2e] rounded-lg p-3 text-center">
           <p className="text-xl font-bold mono text-emerald-400">
             {progress.success}
           </p>
           <p className="text-xs text-gray-600 mt-1">Success</p>
         </div>
-        <div className="bg-[#0f1117] rounded-lg p-3 text-center">
+        <div className="bg-[#1a1d2e] rounded-lg p-3 text-center">
           <p className="text-xl font-bold mono text-red-400">
             {progress.failed}
           </p>
@@ -56,3 +56,8 @@ export default function LiveProgress({ progress }) {
     </div>
   );
 }
+
+
+
+
+

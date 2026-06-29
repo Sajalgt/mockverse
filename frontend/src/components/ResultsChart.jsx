@@ -70,7 +70,7 @@ export default function ResultsChart({ result }) {
           { label: 'P95 Response', value: `${result.metrics.p95ResponseTime}ms` },
           { label: 'Min Response', value: `${result.metrics.minResponseTime}ms` },
         ].map((metric) => (
-          <div key={metric.label} className="bg-[#0f1117] rounded-lg p-3 text-center">
+          <div key={metric.label} className="bg-[#1a1d2e] rounded-lg p-3 text-center">
             <p className="text-sm font-bold mono text-gray-200">{metric.value}</p>
             <p className="text-xs text-gray-600 mt-1">{metric.label}</p>
           </div>
@@ -79,3 +79,8 @@ export default function ResultsChart({ result }) {
     </div>
   );
 }
+
+
+
+
+

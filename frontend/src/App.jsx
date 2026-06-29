@@ -23,21 +23,18 @@ function StepIndicator({ currentStep }) {
             className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mono transition-all duration-300 ${
               currentStep >= step.num
                 ? 'bg-indigo-500 text-white'
-                : 'bg-gray-800 text-gray-500 border border-gray-700'
+                : 'bg-gray-200 text-gray-400 border border-gray-300'
             }`}
           >
             {step.num}
           </div>
           <span
             className={`text-sm transition-all duration-300 ${
-              currentStep >= step.num ? 'text-gray-200' : 'text-gray-600'
+              currentStep >= step.num ? 'text-gray-700' : 'text-gray-400'
             }`}
           >
             {step.label}
           </span>
-          {idx < steps.length - 1 && (
-            <div className="absolute left-[13px] mt-7 w-px h-2 bg-gray-700" />
-          )}
         </div>
       ))}
     </div>
@@ -68,8 +65,8 @@ function App() {
 
         {/* Header */}
         <div className="mb-10 text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-white mono">
-            Mock<span className="text-indigo-400">Verse</span>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-800 mono">
+            Mock<span className="text-indigo-500">Verse</span>
           </h1>
           <p className="text-gray-500 text-sm mt-2">
             AI-powered synthetic data generator & API load tester
@@ -81,10 +78,12 @@ function App() {
           <StepIndicator currentStep={currentStep} />
         </div>
 
-        {/* Cards */}
+        {/* Step 1 — always show */}
         <SchemaInput onSchemaGenerated={handleSchemaGenerated} />
-        <SchemaPreview schema={schema} />
-        <TargetApiForm schema={schema} onTestStarted={handleTestStarted} />
+
+        {/* Step 2 — schema ke baad dikhao */}
+        {schema && <SchemaPreview schema={schema} />}
+        {schema && <TargetApiForm schema={schema} onTestStarted={handleTestStarted} />}
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg p-3 mb-4 text-sm mono">
@@ -92,9 +91,11 @@ function App() {
           </div>
         )}
 
+        {/* Step 3 — test ke baad dikhao */}
         {testStarted && <LiveProgress progress={progress} />}
-        <ResultsChart result={finalResult} />
-        <ErrorBreakdown result={finalResult} />
+        {finalResult && <ResultsChart result={finalResult} />}
+        {finalResult && <ErrorBreakdown result={finalResult} />}
+
         <FAQ />
       </div>
     </div>

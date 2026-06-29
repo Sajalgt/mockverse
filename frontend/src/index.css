@@ -10,8 +10,8 @@
 }
 
 body {
-  background-color: #0f1117;
-  color: #e2e8f0;
+  background-color: #1a1d2e;
+  color: #1a202c;
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
 }
@@ -19,3 +19,8 @@ body {
 .mono {
   font-family: 'JetBrains Mono', monospace;
 }
+
+
+
+
+

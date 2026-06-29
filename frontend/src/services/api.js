@@ -7,23 +7,24 @@ export async function generateSchema(userInput) {
     body: JSON.stringify({ userInput }),
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
-    throw new Error('Schema generate karne mein dikkat aayi');
+    throw new Error(data.error || 'Schema generation failed. Please try again.');
   }
 
-  const data = await response.json();
   return data.schema;
 }
 
-export async function runLoadTest(schema, targetUrl, batchSize = 50, method = 'POST') {
+export async function runLoadTest(schema, targetUrl, batchSize = 50) {
   const response = await fetch(`${BASE_URL}/run-test`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ schema, targetUrl, batchSize, method }),
+    body: JSON.stringify({ schema, targetUrl, batchSize }),
   });
 
   if (!response.ok) {
-    throw new Error('Load test chalane mein dikkat aayi');
+    throw new Error('Load test failed. Please check the URL and try again.');
   }
 
   const data = await response.json();
